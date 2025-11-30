@@ -2,33 +2,79 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Patinho Andando</title>
+<title>Patinho Fugitivo</title>
 <style>
     body {
         margin: 0;
         overflow: hidden;
         background: #87CEEB;
-        font-family: sans-serif;
     }
 
     #duck {
         position: absolute;
-        left: -150px;
-        bottom: 50px;
-        width: 150px;
-        animation: walk 5s linear infinite;
-    }
-
-    @keyframes walk {
-        0% { left: -150px; }
-        100% { left: 100vw; }
+        width: 220px; /* AUMENTAMOS O TAMANHO */
+        transition: transform 0.2s linear;
     }
 </style>
 </head>
 <body>
 
-<!-- Imagem livre de uso -->
+<!-- IMAGEM DO PATINHO -->
 <img id="duck" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Yellow_duck.png">
+
+<!-- ÁUDIO DE QUACK (livre de uso) -->
+<audio id="quack-sound" src="https://www.soundjay.com/animal/duck-quack-1.mp3"></audio>
+
+<script>
+    const duck = document.getElementById("duck");
+    const quackSound = document.getElementById("quack-sound");
+
+    // Coloca o patinho em alguma posição inicial aleatória
+    function randomPosition() {
+        duck.style.left = Math.random() * (window.innerWidth - 200) + "px";
+        duck.style.top = Math.random() * (window.innerHeight - 200) + "px";
+    }
+
+    randomPosition();
+
+    // Faz o patinho fugir do mouse
+    document.addEventListener("mousemove", function (event) {
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+
+        const duckX = duck.offsetLeft + duck.clientWidth / 2;
+        const duckY = duck.offsetTop + duck.clientHeight / 2;
+
+        const dx = duckX - mouseX;
+        const dy = duckY - mouseY;
+
+        // Distância entre pato e mouse
+        const distance = Math.sqrt(dx*dx + dy*dy);
+
+        // Só foge se o mouse chegar perto
+        if (distance < 200) {
+            const angle = Math.atan2(dy, dx);
+
+            // Nova posição fugindo
+            const speed = 40;
+            const newX = duck.offsetLeft + Math.cos(angle) * speed;
+            const newY = duck.offsetTop + Math.sin(angle) * speed;
+
+            // Limita para não sair da tela
+            duck.style.left = Math.min(window.innerWidth - duck.clientWidth, Math.max(0, newX)) + "px";
+            duck.style.top = Math.min(window.innerHeight - duck.clientHeight, Math.max(0, newY)) + "px";
+
+            // Espelha o pato dependendo da direção
+            duck.style.transform = dx < 0 ? "scaleX(-1)" : "scaleX(1)";
+        }
+    });
+
+    // Pato faz QUACK de tempos em tempos
+    setInterval(() => {
+        quackSound.currentTime = 0;
+        quackSound.play();
+    }, 4000); // a cada 4 segundos
+</script>
 
 </body>
 </html>
