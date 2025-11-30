@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>DuckGO</title>
+<title>Patinho Aleatório</title>
 <style>
     body {
         margin: 0;
@@ -29,45 +29,43 @@
 <script>
     const duck = document.querySelector('.duck');
     const steps = document.getElementById('steps');
-    const speed = 2;
 
-    let x = -150; // começa fora da tela
-    let y = -150; // começa fora da tela
-    let targetX = 0;
-    let targetY = 0;
+    const speed = 2;
+    let x = -150; // inicia fora da tela
+    let y = -150;
+    let speedX = speed * 0.5;
+    let speedY = speed;
 
     duck.style.left = x + 'px';
     duck.style.top = y + 'px';
 
     function randomPosition() {
+        // Patinho reaparece em borda aleatória
         if (Math.random() < 0.5) {
-            targetX = 0;
-            targetY = Math.random() * (window.innerHeight - 150);
+            x = 0;
+            y = Math.random() * (window.innerHeight - 150);
         } else {
-            targetX = Math.random() * (window.innerWidth - 150);
-            targetY = 0;
+            x = Math.random() * (window.innerWidth - 150);
+            y = 0;
         }
         duck.style.transform = 'scaleX(1)';
 
-        // toca som ao reaparecer
+        // Toca som de passos ao reaparecer
         if (steps.readyState >= 2) {
             steps.currentTime = 0;
             steps.play().catch(e => console.log("Autoplay bloqueado"));
         }
-
-        // começa fora da tela para entrada suave
-        x = targetX - 150;
-        y = targetY - 150;
     }
 
     function animate() {
-        // aproxima suavemente da posição alvo
-        x += (targetX - x) * 0.05 + speed * 0.5;
-        y += (targetY - y) * 0.05 + speed;
+        // Movimento contínuo
+        x += speedX;
+        y += speedY;
 
         duck.style.left = x + 'px';
         duck.style.top = y + 'px';
 
+        // Se sair da tela, reaparece
         if (y > window.innerHeight || x > window.innerWidth) {
             randomPosition();
         }
