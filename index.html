@@ -1,64 +1,48 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>Patinhos Marchando</title>
-<style>
-    body {
-        margin: 0;
-        height: 100vh;
-        overflow: hidden;
-        background: #d0f0fd; /* azul claro similar ao fundo do GIF */
-        position: relative;
-    }
-
-    .duck {
-        position: absolute;
-        width: 150px;
-        animation: marchDown linear infinite;
-    }
-
-    /* Patinhos individuais com delay para ficarem escalonados */
-    .duck1 { left: 20%; animation-duration: 5s; }
-    .duck2 { left: 50%; animation-duration: 6s; }
-    .duck3 { left: 80%; animation-duration: 7s; }
-
-    @keyframes marchDown {
-        0% {
-            top: -150px;
-            transform: scaleX(1); /* olhando pra frente */
-        }
-        50% {
-            top: 50vh;
-        }
-        100% {
-            top: 100vh;
-            transform: scaleX(-1); /* flip horizontal ao reaparecer */
-        }
-    }
-</style>
-</head>
-<body>
-
-<img class="duck duck1" src="https://usagif.com/wp-content/uploads/2022/4hv9xm/dancing-duck-acegifcom-67.gif" alt="Patinho">
-<img class="duck duck2" src="https://usagif.com/wp-content/uploads/2022/4hv9xm/dancing-duck-acegifcom-67.gif" alt="Patinho">
-<img class="duck duck3" src="https://usagif.com/wp-content/uploads/2022/4hv9xm/dancing-duck-acegifcom-67.gif" alt="Patinho">
-
 <script>
-    // Reaparecer os patinhos do topo quando chegarem ao final
-    const ducks = document.querySelectorAll('.duck');
+    const duck = document.querySelector('.duck');
+    const steps = document.getElementById('steps');
+    const speed = 2;
 
-    ducks.forEach(duck => {
-        duck.addEventListener('animationiteration', () => {
-            // Alterna flip horizontal a cada ciclo
-            if (duck.style.transform === 'scaleX(1)') {
-                duck.style.transform = 'scaleX(-1)';
-            } else {
-                duck.style.transform = 'scaleX(1)';
-            }
-        });
-    });
+    let x = 0;
+    let y = 0;
+
+    duck.style.left = x + 'px';
+    duck.style.top = y + 'px';
+
+    let lastStepTime = 0; // guarda o último momento que o som tocou
+    const stepInterval = 300; // intervalo mínimo em ms entre sons
+
+    function randomPosition() {
+        if (Math.random() < 0.5) {
+            x = 0;
+            y = Math.random() * (window.innerHeight - 150);
+        } else {
+            x = Math.random() * (window.innerWidth - 150);
+            y = 0;
+        }
+        duck.style.transform = 'scaleX(1)';
+    }
+
+    function animate(timestamp) {
+        y += speed;
+        x += speed * 0.5;
+
+        duck.style.left = x + 'px';
+        duck.style.top = y + 'px';
+
+        // toca som se passou tempo suficiente desde a última vez
+        if (timestamp - lastStepTime > stepInterval) {
+            steps.currentTime = 0;
+            steps.play();
+            lastStepTime = timestamp;
+        }
+
+        if (y > window.innerHeight || x > window.innerWidth) {
+            randomPosition();
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
 </script>
-
-</body>
-</html>
