@@ -1,3 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Patinho Aleatório</title>
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+        background: #ffffff;
+        position: relative;
+    }
+
+    .duck {
+        position: absolute;
+        width: 150px;
+        transform: scaleX(1);
+        transition: transform 0.2s linear;
+    }
+</style>
+</head>
+<body>
+
+<img class="duck" src="https://media1.tenor.com/m/7ynpnSTwF2IAAAAC/pato.gif" alt="Patinho">
+<audio id="steps" src="steps.mp3"></audio>
+
 <script>
     const duck = document.querySelector('.duck');
     const steps = document.getElementById('steps');
@@ -8,9 +36,6 @@
 
     duck.style.left = x + 'px';
     duck.style.top = y + 'px';
-
-    let lastStepTime = 0; // guarda o último momento que o som tocou
-    const stepInterval = 300; // intervalo mínimo em ms entre sons
 
     function randomPosition() {
         if (Math.random() < 0.5) {
@@ -23,19 +48,18 @@
         duck.style.transform = 'scaleX(1)';
     }
 
-    function animate(timestamp) {
+    // Reproduz o som a cada 1 segundo
+    setInterval(() => {
+        steps.currentTime = 0;
+        steps.play();
+    }, 1000);
+
+    function animate() {
         y += speed;
         x += speed * 0.5;
 
         duck.style.left = x + 'px';
         duck.style.top = y + 'px';
-
-        // toca som se passou tempo suficiente desde a última vez
-        if (timestamp - lastStepTime > stepInterval) {
-            steps.currentTime = 0;
-            steps.play();
-            lastStepTime = timestamp;
-        }
 
         if (y > window.innerHeight || x > window.innerWidth) {
             randomPosition();
@@ -44,5 +68,8 @@
         requestAnimationFrame(animate);
     }
 
-    requestAnimationFrame(animate);
+    animate();
 </script>
+
+</body>
+</html>
