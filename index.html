@@ -2,29 +2,63 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Patinho Dançante</title>
+<title>Patinhos Marchando</title>
 <style>
     body {
         margin: 0;
         height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: #87CEEB; /* céu azul */
+        overflow: hidden;
+        background: #d0f0fd; /* azul claro similar ao fundo do GIF */
+        position: relative;
     }
 
     .duck {
-        width: 200px; /* tamanho do GIF */
-        animation: moveDuck 5s linear infinite alternate;
+        position: absolute;
+        width: 150px;
+        animation: marchDown linear infinite;
     }
 
-    @keyframes moveDuck {
-        0% { transform: translateX(-50px); }
-        100% { transform: translateX(50px); }
+    /* Patinhos individuais com delay para ficarem escalonados */
+    .duck1 { left: 20%; animation-duration: 5s; }
+    .duck2 { left: 50%; animation-duration: 6s; }
+    .duck3 { left: 80%; animation-duration: 7s; }
+
+    @keyframes marchDown {
+        0% {
+            top: -150px;
+            transform: scaleX(1); /* olhando pra frente */
+        }
+        50% {
+            top: 50vh;
+        }
+        100% {
+            top: 100vh;
+            transform: scaleX(-1); /* flip horizontal ao reaparecer */
+        }
     }
 </style>
 </head>
 <body>
-    <img class="duck" src="https://usagif.com/wp-content/uploads/2022/4hv9xm/dancing-duck-acegifcom-67.gif" alt="Patinho Dançante">
+
+<img class="duck duck1" src="https://usagif.com/wp-content/uploads/2022/4hv9xm/dancing-duck-acegifcom-67.gif" alt="Patinho">
+<img class="duck duck2" src="https://usagif.com/wp-content/uploads/2022/4hv9xm/dancing-duck-acegifcom-67.gif" alt="Patinho">
+<img class="duck duck3" src="https://usagif.com/wp-content/uploads/2022/4hv9xm/dancing-duck-acegifcom-67.gif" alt="Patinho">
+
+<script>
+    // Reaparecer os patinhos do topo quando chegarem ao final
+    const ducks = document.querySelectorAll('.duck');
+
+    ducks.forEach(duck => {
+        duck.addEventListener('animationiteration', () => {
+            // Alterna flip horizontal a cada ciclo
+            if (duck.style.transform === 'scaleX(1)') {
+                duck.style.transform = 'scaleX(-1)';
+            } else {
+                duck.style.transform = 'scaleX(1)';
+            }
+        });
+    });
+</script>
+
 </body>
 </html>
