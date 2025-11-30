@@ -2,13 +2,13 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Super Patos</title>
+<title>Duck gonna wild</title>
 <style>
     body {
         margin: 0;
         overflow: hidden;
         background: #87CEEB;
-        cursor: url('https://cur.cursors-4u.net/nature/nat-11/nat1021.cur'), auto; /* cursor de raposa */
+        cursor: url('https://i.imgur.com/N4F2shW.png'), auto; /* cursor de raposa */
     }
 
     .duck {
@@ -17,9 +17,15 @@
         transition: transform 0.2s linear;
     }
 
+    /* cores dos patinhos */
+    .yellow { filter: hue-rotate(45deg); }
+    .white  { filter: brightness(2) saturate(0); }
+    .black  { filter: brightness(0); }
+    .blue   { filter: hue-rotate(180deg); }
+
     .boss {
         width: 260px;
-        filter: hue-rotate(120deg);
+        filter: hue-rotate(90deg);
     }
 
     #splash {
@@ -45,13 +51,14 @@
 
 <div id="score">Pontos: 0</div>
 
-<!-- PATOS NORMAIS -->
-<img class="duck" src="https://img.freepik.com/vector-premium/pixeles-8-bits-vector-pato-arte-diseno-arte-pixeles-pato_565656-1478.jpg?w=2000">
-<img class="duck" src="https://static.vecteezy.com/system/resources/previews/019/922/266/large_2x/8bit-pixels-art-duck-duck-pixel-art-design-free-vector.jpg">
-<img class="duck" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Yellow_duck.png">
+<!-- 4 PATOS COLORIDOS -->
+<img class="duck yellow" src="https://www.pngkey.com/png/detail/159-1598985_duck-hunt-duck-hunt-pixel-art.png">
+<img class="duck white"  src="https://www.pngkey.com/png/detail/159-1598985_duck-hunt-duck-hunt-pixel-art.png">
+<img class="duck black"  src="https://www.pngkey.com/png/detail/159-1598985_duck-hunt-duck-hunt-pixel-art.png">
+<img class="duck blue"   src="https://www.pngkey.com/png/detail/159-1598985_duck-hunt-duck-hunt-pixel-art.png">
 
 <!-- PATO CHEFÃO -->
-<img id="boss" class="duck boss" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Yellow_duck.png">
+<img id="boss" class="duck boss" src="https://www.pngkey.com/png/detail/159-1598985_duck-hunt-duck-hunt-pixel-art.png">
 
 <!-- SPLASH -->
 <img id="splash" src="https://i.imgur.com/4ZQZ4U9.png">
@@ -77,7 +84,7 @@
         img.style.top = Math.random() * (window.innerHeight - img.clientHeight) + "px";
     }
 
-    // Posiciona tudo inicial
+    // posiciona tudo inicial
     ducks.forEach(d => randomPos(d));
     randomPos(boss);
 
@@ -94,8 +101,14 @@
                 moveDuck(duck, Math.cos(angle)*30, Math.sin(angle)*30);
 
                 // muda cor quando assustado
-                duck.style.filter = "hue-rotate(90deg)";
-                setTimeout(() => duck.style.filter = "none", 300);
+                duck.style.filter += " hue-rotate(90deg)";
+                setTimeout(() => {
+                    // reseta a cor original
+                    if(duck.classList.contains("yellow")) duck.style.filter = "hue-rotate(45deg)";
+                    if(duck.classList.contains("white"))  duck.style.filter = "brightness(2) saturate(0)";
+                    if(duck.classList.contains("black"))  duck.style.filter = "brightness(0)";
+                    if(duck.classList.contains("blue"))   duck.style.filter = "hue-rotate(180deg)";
+                }, 300);
             }
         });
 
@@ -107,7 +120,6 @@
         moveDuck(boss, Math.cos(angle)*10, Math.sin(angle)*10);
     });
 
-    // mover pato e gerar splash
     function moveDuck(duck, vx, vy) {
         let newX = duck.offsetLeft + vx;
         let newY = duck.offsetTop + vy;
@@ -115,12 +127,11 @@
         const maxX = window.innerWidth - duck.clientWidth;
         const maxY = window.innerHeight - duck.clientHeight;
 
-        // splash ao bater nas bordas
+        // splash e quack ao bater borda
         if (newX <= 0 || newX >= maxX || newY <= 0 || newY >= maxY) {
             splash.style.left = duck.offsetLeft + "px";
             splash.style.top = duck.offsetTop + "px";
             splash.style.display = "block";
-
             setTimeout(() => splash.style.display = "none", 150);
 
             quack.currentTime = 0;
@@ -140,4 +151,3 @@
 
 </body>
 </html>
-
