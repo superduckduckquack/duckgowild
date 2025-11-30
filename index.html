@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Patinho Andando</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background: #87CEEB;
+        font-family: sans-serif;
+    }
+
+    #duck {
+        position: absolute;
+        left: -150px;
+        bottom: 50px;
+        width: 150px;
+        animation: walk 5s linear infinite;
+    }
+
+    @keyframes walk {
+        0% { left: -150px; }
+        100% { left: 100vw; }
+    }
+</style>
+</head>
+<body>
+
+<!-- Imagem livre de uso -->
+<img id="duck" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Yellow_duck.png">
+
+</body>
+</html>
