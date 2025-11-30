@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Patinho Aleatório</title>
+<title>DuckGO</title>
 <style>
     body {
         margin: 0;
@@ -24,7 +24,6 @@
 <body>
 
 <img class="duck" src="https://media1.tenor.com/m/7ynpnSTwF2IAAAAC/pato.gif" alt="Patinho">
-
 <audio id="steps" src="steps.mp3"></audio>
 
 <script>
@@ -32,38 +31,39 @@
     const steps = document.getElementById('steps');
     const speed = 2;
 
-    let x = 0;
-    let y = 0;
+    let x = -150; // começa fora da tela
+    let y = -150; // começa fora da tela
+    let targetX = 0;
+    let targetY = 0;
 
     duck.style.left = x + 'px';
     duck.style.top = y + 'px';
 
     function randomPosition() {
-        // Escolhe borda aleatória (topo ou esquerda)
         if (Math.random() < 0.5) {
-            x = 0; // esquerda
-            y = Math.random() * (window.innerHeight - 150);
+            targetX = 0;
+            targetY = Math.random() * (window.innerHeight - 150);
         } else {
-            x = Math.random() * (window.innerWidth - 150);
-            y = 0; // topo
+            targetX = Math.random() * (window.innerWidth - 150);
+            targetY = 0;
         }
         duck.style.transform = 'scaleX(1)';
+
+        // toca som ao reaparecer
+        if (steps.readyState >= 2) {
+            steps.currentTime = 0;
+            steps.play().catch(e => console.log("Autoplay bloqueado"));
+        }
+
+        // começa fora da tela para entrada suave
+        x = targetX - 150;
+        y = targetY - 150;
     }
 
-    // Tocar áudio 1 vez por segundo, apenas se estiver carregado
-    setInterval(() => {
-        if (steps.readyState >= 2) { // se áudio carregado
-            steps.currentTime = 0;
-            steps.play().catch(e => {
-                // evita erros de autoplay
-                console.log("Autoplay bloqueado");
-            });
-        }
-    }, 1000);
-
     function animate() {
-        y += speed; 
-        x += speed * 0.5; 
+        // aproxima suavemente da posição alvo
+        x += (targetX - x) * 0.05 + speed * 0.5;
+        y += (targetY - y) * 0.05 + speed;
 
         duck.style.left = x + 'px';
         duck.style.top = y + 'px';
@@ -75,6 +75,8 @@
         requestAnimationFrame(animate);
     }
 
+    // inicia com uma posição aleatória
+    randomPosition();
     animate();
 </script>
 
