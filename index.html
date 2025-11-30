@@ -24,6 +24,7 @@
 <body>
 
 <img class="duck" src="https://media1.tenor.com/m/7ynpnSTwF2IAAAAC/pato.gif" alt="Patinho">
+
 <audio id="steps" src="steps.mp3"></audio>
 
 <script>
@@ -38,25 +39,31 @@
     duck.style.top = y + 'px';
 
     function randomPosition() {
+        // Escolhe borda aleatória (topo ou esquerda)
         if (Math.random() < 0.5) {
-            x = 0;
+            x = 0; // esquerda
             y = Math.random() * (window.innerHeight - 150);
         } else {
             x = Math.random() * (window.innerWidth - 150);
-            y = 0;
+            y = 0; // topo
         }
         duck.style.transform = 'scaleX(1)';
     }
 
-    // Reproduz o som a cada 1 segundo
+    // Tocar áudio 1 vez por segundo, apenas se estiver carregado
     setInterval(() => {
-        steps.currentTime = 0;
-        steps.play();
+        if (steps.readyState >= 2) { // se áudio carregado
+            steps.currentTime = 0;
+            steps.play().catch(e => {
+                // evita erros de autoplay
+                console.log("Autoplay bloqueado");
+            });
+        }
     }, 1000);
 
     function animate() {
-        y += speed;
-        x += speed * 0.5;
+        y += speed; 
+        x += speed * 0.5; 
 
         duck.style.left = x + 'px';
         duck.style.top = y + 'px';
