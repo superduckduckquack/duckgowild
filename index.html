@@ -2,78 +2,140 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Patinho Fugitivo</title>
+<title>Super Patos</title>
 <style>
     body {
         margin: 0;
         overflow: hidden;
         background: #87CEEB;
+        cursor: url('https://cur.cursors-4u.net/nature/nat-11/nat1021.cur'), auto; /* cursor de raposa */
     }
 
-    #duck {
+    .duck {
         position: absolute;
-        width: 220px; /* AUMENTAMOS O TAMANHO */
+        width: 150px;
         transition: transform 0.2s linear;
+    }
+
+    .boss {
+        width: 260px;
+        filter: hue-rotate(120deg);
+    }
+
+    #splash {
+        position: absolute;
+        pointer-events: none;
+        width: 120px;
+        display: none;
+    }
+
+    #score {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 10px 20px;
+        background: rgba(255,255,255,0.7);
+        border-radius: 10px;
+        font-size: 24px;
+        font-family: Arial, sans-serif;
     }
 </style>
 </head>
 <body>
 
-<!-- IMAGEM DO PATINHO -->
-<img id="duck" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Yellow_duck.png">
+<div id="score">Pontos: 0</div>
 
-<!-- ÁUDIO DE QUACK (livre de uso) -->
-<audio id="quack-sound" src="https://www.soundjay.com/animal/duck-quack-1.mp3"></audio>
+<!-- PATOS NORMAIS -->
+<img class="duck" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Yellow_duck.png">
+<img class="duck" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Yellow_duck.png">
+<img class="duck" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Yellow_duck.png">
+
+<!-- PATO CHEFÃO -->
+<img id="boss" class="duck boss" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Yellow_duck.png">
+
+<!-- SPLASH -->
+<img id="splash" src="https://i.imgur.com/4ZQZ4U9.png">
+
+<!-- SONS -->
+<audio id="quack" src="https://www.soundjay.com/animal/duck-quack-1.mp3"></audio>
+<audio id="bgm" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
 
 <script>
-    const duck = document.getElementById("duck");
-    const quackSound = document.getElementById("quack-sound");
+    const ducks = document.querySelectorAll(".duck:not(.boss)");
+    const boss = document.getElementById("boss");
+    const splash = document.getElementById("splash");
+    const scoreBox = document.getElementById("score");
+    const quack = document.getElementById("quack");
+    const bgm = document.getElementById("bgm");
 
-    // Coloca o patinho em alguma posição inicial aleatória
-    function randomPosition() {
-        duck.style.left = Math.random() * (window.innerWidth - 200) + "px";
-        duck.style.top = Math.random() * (window.innerHeight - 200) + "px";
+    let score = 0;
+    bgm.volume = 0.3;
+    bgm.play();
+
+    function randomPos(img) {
+        img.style.left = Math.random() * (window.innerWidth - img.clientWidth) + "px";
+        img.style.top = Math.random() * (window.innerHeight - img.clientHeight) + "px";
     }
 
-    randomPosition();
+    // Posiciona tudo inicial
+    ducks.forEach(d => randomPos(d));
+    randomPos(boss);
 
-    // Faz o patinho fugir do mouse
-    document.addEventListener("mousemove", function (event) {
-        const mouseX = event.clientX;
-        const mouseY = event.clientY;
+    document.addEventListener("mousemove", (e) => {
+        const mx = e.clientX, my = e.clientY;
 
-        const duckX = duck.offsetLeft + duck.clientWidth / 2;
-        const duckY = duck.offsetTop + duck.clientHeight / 2;
+        ducks.forEach(duck => {
+            const dx = duck.offsetLeft + duck.clientWidth/2 - mx;
+            const dy = duck.offsetTop + duck.clientHeight/2 - my;
+            const dist = Math.sqrt(dx*dx + dy*dy);
 
-        const dx = duckX - mouseX;
-        const dy = duckY - mouseY;
+            if (dist < 180) {
+                const angle = Math.atan2(dy, dx);
+                moveDuck(duck, Math.cos(angle)*30, Math.sin(angle)*30);
 
-        // Distância entre pato e mouse
-        const distance = Math.sqrt(dx*dx + dy*dy);
+                // muda cor quando assustado
+                duck.style.filter = "hue-rotate(90deg)";
+                setTimeout(() => duck.style.filter = "none", 300);
+            }
+        });
 
-        // Só foge se o mouse chegar perto
-        if (distance < 200) {
-            const angle = Math.atan2(dy, dx);
+        // chefão persegue
+        const dx = mx - (boss.offsetLeft + boss.clientWidth/2);
+        const dy = my - (boss.offsetTop + boss.clientHeight/2);
+        const angle = Math.atan2(dy, dx);
 
-            // Nova posição fugindo
-            const speed = 40;
-            const newX = duck.offsetLeft + Math.cos(angle) * speed;
-            const newY = duck.offsetTop + Math.sin(angle) * speed;
-
-            // Limita para não sair da tela
-            duck.style.left = Math.min(window.innerWidth - duck.clientWidth, Math.max(0, newX)) + "px";
-            duck.style.top = Math.min(window.innerHeight - duck.clientHeight, Math.max(0, newY)) + "px";
-
-            // Espelha o pato dependendo da direção
-            duck.style.transform = dx < 0 ? "scaleX(-1)" : "scaleX(1)";
-        }
+        moveDuck(boss, Math.cos(angle)*10, Math.sin(angle)*10);
     });
 
-    // Pato faz QUACK de tempos em tempos
-    setInterval(() => {
-        quackSound.currentTime = 0;
-        quackSound.play();
-    }, 4000); // a cada 4 segundos
+    // mover pato e gerar splash
+    function moveDuck(duck, vx, vy) {
+        let newX = duck.offsetLeft + vx;
+        let newY = duck.offsetTop + vy;
+
+        const maxX = window.innerWidth - duck.clientWidth;
+        const maxY = window.innerHeight - duck.clientHeight;
+
+        // splash ao bater nas bordas
+        if (newX <= 0 || newX >= maxX || newY <= 0 || newY >= maxY) {
+            splash.style.left = duck.offsetLeft + "px";
+            splash.style.top = duck.offsetTop + "px";
+            splash.style.display = "block";
+
+            setTimeout(() => splash.style.display = "none", 150);
+
+            quack.currentTime = 0;
+            quack.play();
+
+            score += 1;
+            scoreBox.textContent = "Pontos: " + score;
+        }
+
+        duck.style.left = Math.min(maxX, Math.max(0, newX)) + "px";
+        duck.style.top = Math.min(maxY, Math.max(0, newY)) + "px";
+
+        // virar
+        duck.style.transform = vx < 0 ? "scaleX(-1)" : "scaleX(1)";
+    }
 </script>
 
 </body>
