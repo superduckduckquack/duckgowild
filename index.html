@@ -2,152 +2,29 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Duck gonna wild</title>
+<title>Patinho Dançante</title>
 <style>
     body {
         margin: 0;
-        overflow: hidden;
-        background: #87CEEB;
-        cursor: url('https://i.imgur.com/N4F2shW.png'), auto; /* cursor de raposa */
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #87CEEB; /* céu azul */
     }
 
     .duck {
-        position: absolute;
-        width: 150px;
-        transition: transform 0.2s linear;
+        width: 200px; /* tamanho do GIF */
+        animation: moveDuck 5s linear infinite alternate;
     }
 
-    /* cores dos patinhos */
-    .yellow { filter: hue-rotate(45deg); }
-    .white  { filter: brightness(2) saturate(0); }
-    .black  { filter: brightness(0); }
-    .blue   { filter: hue-rotate(180deg); }
-
-    .boss {
-        width: 260px;
-        filter: hue-rotate(90deg);
-    }
-
-    #splash {
-        position: absolute;
-        pointer-events: none;
-        width: 120px;
-        display: none;
-    }
-
-    #score {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        padding: 10px 20px;
-        background: rgba(255,255,255,0.7);
-        border-radius: 10px;
-        font-size: 24px;
-        font-family: Arial, sans-serif;
+    @keyframes moveDuck {
+        0% { transform: translateX(-50px); }
+        100% { transform: translateX(50px); }
     }
 </style>
 </head>
 <body>
-
-<div id="score">Pontos: 0</div>
-
-<!-- 4 PATOS COLORIDOS -->
-<img class="duck yellow" src="https://www.pngkey.com/png/detail/159-1598985_duck-hunt-duck-hunt-pixel-art.png">
-<img class="duck white"  src="https://www.pngkey.com/png/detail/159-1598985_duck-hunt-duck-hunt-pixel-art.png">
-<img class="duck black"  src="https://www.pngkey.com/png/detail/159-1598985_duck-hunt-duck-hunt-pixel-art.png">
-<img class="duck blue"   src="https://www.pngkey.com/png/detail/159-1598985_duck-hunt-duck-hunt-pixel-art.png">
-
-<!-- PATO CHEFÃO -->
-<img id="boss" class="duck boss" src="https://www.pngkey.com/png/detail/159-1598985_duck-hunt-duck-hunt-pixel-art.png">
-
-<!-- SPLASH -->
-<img id="splash" src="https://i.imgur.com/4ZQZ4U9.png">
-
-<!-- SONS -->
-<audio id="quack" src="https://www.soundjay.com/animal/duck-quack-1.mp3"></audio>
-<audio id="bgm" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
-
-<script>
-    const ducks = document.querySelectorAll(".duck:not(.boss)");
-    const boss = document.getElementById("boss");
-    const splash = document.getElementById("splash");
-    const scoreBox = document.getElementById("score");
-    const quack = document.getElementById("quack");
-    const bgm = document.getElementById("bgm");
-
-    let score = 0;
-    bgm.volume = 0.3;
-    bgm.play();
-
-    function randomPos(img) {
-        img.style.left = Math.random() * (window.innerWidth - img.clientWidth) + "px";
-        img.style.top = Math.random() * (window.innerHeight - img.clientHeight) + "px";
-    }
-
-    // posiciona tudo inicial
-    ducks.forEach(d => randomPos(d));
-    randomPos(boss);
-
-    document.addEventListener("mousemove", (e) => {
-        const mx = e.clientX, my = e.clientY;
-
-        ducks.forEach(duck => {
-            const dx = duck.offsetLeft + duck.clientWidth/2 - mx;
-            const dy = duck.offsetTop + duck.clientHeight/2 - my;
-            const dist = Math.sqrt(dx*dx + dy*dy);
-
-            if (dist < 180) {
-                const angle = Math.atan2(dy, dx);
-                moveDuck(duck, Math.cos(angle)*30, Math.sin(angle)*30);
-
-                // muda cor quando assustado
-                duck.style.filter += " hue-rotate(90deg)";
-                setTimeout(() => {
-                    // reseta a cor original
-                    if(duck.classList.contains("yellow")) duck.style.filter = "hue-rotate(45deg)";
-                    if(duck.classList.contains("white"))  duck.style.filter = "brightness(2) saturate(0)";
-                    if(duck.classList.contains("black"))  duck.style.filter = "brightness(0)";
-                    if(duck.classList.contains("blue"))   duck.style.filter = "hue-rotate(180deg)";
-                }, 300);
-            }
-        });
-
-        // chefão persegue
-        const dx = mx - (boss.offsetLeft + boss.clientWidth/2);
-        const dy = my - (boss.offsetTop + boss.clientHeight/2);
-        const angle = Math.atan2(dy, dx);
-
-        moveDuck(boss, Math.cos(angle)*10, Math.sin(angle)*10);
-    });
-
-    function moveDuck(duck, vx, vy) {
-        let newX = duck.offsetLeft + vx;
-        let newY = duck.offsetTop + vy;
-
-        const maxX = window.innerWidth - duck.clientWidth;
-        const maxY = window.innerHeight - duck.clientHeight;
-
-        // splash e quack ao bater borda
-        if (newX <= 0 || newX >= maxX || newY <= 0 || newY >= maxY) {
-            splash.style.left = duck.offsetLeft + "px";
-            splash.style.top = duck.offsetTop + "px";
-            splash.style.display = "block";
-            setTimeout(() => splash.style.display = "none", 150);
-
-            quack.currentTime = 0;
-            quack.play();
-
-            score += 1;
-            scoreBox.textContent = "Pontos: " + score;
-        }
-
-        duck.style.left = Math.min(maxX, Math.max(0, newX)) + "px";
-        duck.style.top = Math.min(maxY, Math.max(0, newY)) + "px";
-
-        // virar
-        duck.style.transform = vx < 0 ? "scaleX(-1)" : "scaleX(1)";
-    }
-</script>
-
+    <img class="duck" src="https://usagif.com/wp-content/uploads/2022/4hv9xm/dancing-duck-acegifcom-67.gif" alt="Patinho Dançante">
 </body>
 </html>
