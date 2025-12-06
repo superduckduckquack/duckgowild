@@ -9,63 +9,100 @@
         height: 100vh;
         width: 100vw;
         overflow: hidden;
-        background: #ffffff;
+        background: #ffffff; /* fundo branco */
         position: relative;
+        font-family: Arial, sans-serif;
     }
 
     .duck {
         position: absolute;
         width: 150px;
-        transform: scaleX(1);
+        transform: scaleX(1); /* inicial: olhando pra direita */
         transition: transform 0.2s linear;
+    }
+
+    /* contador no canto superior esquerdo */
+    #contador {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 6px 12px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        z-index: 10;
     }
 </style>
 </head>
 <body>
 
+<!-- contador de visitas -->
+<div id="contador">Visitas: carregando...</div>
+
 <img class="duck" src="https://media1.tenor.com/m/7ynpnSTwF2IAAAAC/pato.gif" alt="Patinho">
+
 <audio id="steps" src="steps.mp3"></audio>
 
 <script>
+/* ----------- CONTADOR DE VISITAS ----------- */
+fetch("https://api.countapi.xyz/hit/patinho-site/visitas")
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("contador").innerText = "Visitas: " + data.value;
+  });
+/* ------------------------------------------- */
+
+
+
     const duck = document.querySelector('.duck');
     const steps = document.getElementById('steps');
+    const speed = 2; // pixels por frame
 
-    const speed = 2;
-    let x = -150; // inicia fora da tela
-    let y = -150;
-    let speedX = speed * 0.5;
-    let speedY = speed;
+    // Inicializa posição na borda esquerda e topo
+    let x = 0;
+    let y = 0;
 
     duck.style.left = x + 'px';
     duck.style.top = y + 'px';
 
     function randomPosition() {
-        // Patinho reaparece em borda aleatória
-        if (Math.random() < 0.5) {
-            x = 0;
-            y = Math.random() * (window.innerHeight - 150);
-        } else {
-            x = Math.random() * (window.innerWidth - 150);
-            y = 0;
+        const side = Math.floor(Math.random() * 4);
+        switch(side) {
+            case 0: // topo
+                x = Math.random() * (window.innerWidth - 150);
+                y = -150;
+                break;
+            case 1: // esquerda
+                x = -150;
+                y = Math.random() * (window.innerHeight - 150);
+                break;
+            case 2: // direita
+                x = window.innerWidth;
+                y = Math.random() * (window.innerHeight - 150);
+                break;
+            case 3: // bottom
+                x = Math.random() * (window.innerWidth - 150);
+                y = window.innerHeight;
+                break;
         }
-        duck.style.transform = 'scaleX(1)';
 
-        // Toca som de passos ao reaparecer
-        if (steps.readyState >= 2) {
-            steps.currentTime = 0;
-            steps.play().catch(e => console.log("Autoplay bloqueado"));
-        }
+        duck.style.transform = 'scaleX(1)';
     }
 
     function animate() {
-        // Movimento contínuo
-        x += speedX;
-        y += speedY;
+        y += speed; 
+        x += speed * 0.5;
 
         duck.style.left = x + 'px';
         duck.style.top = y + 'px';
 
-        // Se sair da tela, reaparece
+        if (Math.floor(y) % 30 === 0) {
+            steps.currentTime = 0;
+            steps.play();
+        }
+
         if (y > window.innerHeight || x > window.innerWidth) {
             randomPosition();
         }
@@ -73,8 +110,6 @@
         requestAnimationFrame(animate);
     }
 
-    // inicia com uma posição aleatória
-    randomPosition();
     animate();
 </script>
 
