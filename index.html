@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <title>Patinho Aleatório</title>
+
 <style>
     body {
         margin: 0;
         height: 100vh;
         width: 100vw;
         overflow: hidden;
-        background: #ffffff; /* fundo branco */
+        background: #ffffff;
         position: relative;
         font-family: Arial, sans-serif;
     }
@@ -17,17 +18,16 @@
     .duck {
         position: absolute;
         width: 150px;
-        transform: scaleX(1); /* inicial: olhando pra direita */
+        transform: scaleX(1);
         transition: transform 0.2s linear;
     }
 
-    /* contador no canto superior esquerdo */
     #contador {
         position: absolute;
         top: 10px;
         left: 10px;
         padding: 6px 12px;
-        background: rgba(255, 255, 255, 0.8);
+        background: rgba(255, 255, 255, 0.9);
         border-radius: 8px;
         font-size: 18px;
         font-weight: bold;
@@ -38,79 +38,111 @@
 </head>
 <body>
 
-<!-- contador de visitas -->
+<!-- CONTADOR -->
 <div id="contador">Visitas: carregando...</div>
 
+<!-- PATINHO -->
 <img class="duck" src="https://media1.tenor.com/m/7ynpnSTwF2IAAAAC/pato.gif" alt="Patinho">
 
+<!-- ÁUDIO -->
 <audio id="steps" src="steps.mp3"></audio>
 
 <script>
-/* ----------- CONTADOR DE VISITAS ----------- */
-fetch("https://api.countapi.xyz/hit/patinho-site/visitas")
+/* ===============================
+   CONTADOR DE VISITAS (FUNCIONANDO)
+   =============================== */
+fetch("https://counterapi.com/api/patinho-site/visitas/incr")
   .then(res => res.json())
   .then(data => {
-    document.getElementById("contador").innerText = "Visitas: " + data.value;
+    document.getElementById("contador").innerText = "Visitas: " + data.count;
+  })
+  .catch(() => {
+    document.getElementById("contador").innerText = "Visitas: erro";
   });
-/* ------------------------------------------- */
 
 
 
-    const duck = document.querySelector('.duck');
-    const steps = document.getElementById('steps');
-    const speed = 2; // pixels por frame
+/* ===============================
+   ANIMAÇÃO DO PATINHO
+   =============================== */
+const duck = document.querySelector('.duck');
+const steps = document.getElementById('steps');
 
-    // Inicializa posição na borda esquerda e topo
-    let x = 0;
-    let y = 0;
+const speed = 2;    // velocidade vertical
+const dx = 0.5;     // velocidade horizontal leve
+
+let x = 0;
+let y = 0;
+
+duck.style.left = x + 'px';
+duck.style.top = y + 'px';
+
+/* ----------------
+   REPOSICIONA O PATINHO SEM TRAVAR
+   ---------------- */
+function randomPosition() {
+    const side = Math.floor(Math.random() * 4);
+
+    switch(side) {
+        case 0: // topo
+            x = Math.random() * (window.innerWidth - 150);
+            y = -200;
+            break;
+        case 1: // esquerda
+            x = -200;
+            y = Math.random() * (window.innerHeight - 150);
+            break;
+        case 2: // direita
+            x = window.innerWidth + 200;
+            y = Math.random() * (window.innerHeight - 150);
+            break;
+        case 3: // bottom
+            x = Math.random() * (window.innerWidth - 150);
+            y = window.innerHeight + 200;
+            break;
+    }
+
+    duck.style.left = x + "px";
+    duck.style.top = y + "px";
+
+    duck.style.transform = "scaleX(1)";
+}
+
+/* ----------------
+   ÁUDIO SEM BUGS
+   ---------------- */
+let canPlay = true;
+
+steps.onended = () => {
+    canPlay = true;
+};
+
+/* ----------------
+   ANIMAÇÃO BASE
+   ---------------- */
+function animate() {
+    y += speed;
+    x += dx * speed;
 
     duck.style.left = x + 'px';
     duck.style.top = y + 'px';
 
-    function randomPosition() {
-        const side = Math.floor(Math.random() * 4);
-        switch(side) {
-            case 0: // topo
-                x = Math.random() * (window.innerWidth - 150);
-                y = -150;
-                break;
-            case 1: // esquerda
-                x = -150;
-                y = Math.random() * (window.innerHeight - 150);
-                break;
-            case 2: // direita
-                x = window.innerWidth;
-                y = Math.random() * (window.innerHeight - 150);
-                break;
-            case 3: // bottom
-                x = Math.random() * (window.innerWidth - 150);
-                y = window.innerHeight;
-                break;
-        }
-
-        duck.style.transform = 'scaleX(1)';
+    // toca som somente quando pode
+    if (Math.floor(y) % 30 === 0 && canPlay) {
+        canPlay = false;
+        steps.currentTime = 0;
+        steps.play().catch(() => {});
     }
 
-    function animate() {
-        y += speed; 
-        x += speed * 0.5;
-
-        duck.style.left = x + 'px';
-        duck.style.top = y + 'px';
-
-        if (Math.floor(y) % 30 === 0) {
-            steps.currentTime = 0;
-            steps.play();
-        }
-
-        if (y > window.innerHeight || x > window.innerWidth) {
-            randomPosition();
-        }
-
-        requestAnimationFrame(animate);
+    // reposicionamento confiável
+    if (y > window.innerHeight + 250 || x > window.innerWidth + 250) {
+        randomPosition();
     }
 
-    animate();
+    requestAnimationFrame(animate);
+}
+
+animate();
 </script>
 
 </body>
